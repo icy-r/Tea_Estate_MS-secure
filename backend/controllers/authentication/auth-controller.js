@@ -2,6 +2,10 @@ import jwt from 'jsonwebtoken'
 
 import { Employee } from '../../models/employee-management/employee-model.js'
 import { Profile } from '../../models/user-management/profile-model.js'
+import { pick } from '../../utils/pick.js'
+
+const SIGNUP_FIELDS = ['firstName', 'lastName', 'Id', 'email', 'age', 'gender', 'dateOfBirth',
+  'contactNumber', 'designation', 'department', 'dateOfJoining', 'salary', 'leavesLeft', 'address', 'password']
 
 async function signup(req, res) {
   try {
@@ -10,12 +14,13 @@ async function signup(req, res) {
       throw new Error('no CLOUDINARY_URL in back-end .env file')
     }
 
-    const user = await Employee.findOne({ email: req.body.email })
+    const data = pick(req.body, SIGNUP_FIELDS)
+    const user = await Employee.findOne({ email: data.email })
     if (user) throw new Error('Account already exists')
 
-    const newProfile = await Profile.create(req.body)
+    const newProfile = await Profile.create({ name: `${data.firstName} ${data.lastName}` })
     req.body.profile = newProfile._id
-    const newEmployee = await Employee.create(req.body)
+    const newEmployee = await Employee.create({ ...data, profile: newProfile._id })
 
     const token = createJWT(newEmployee)
     res.status(200).json({ token })

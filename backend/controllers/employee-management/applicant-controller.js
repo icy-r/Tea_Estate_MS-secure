@@ -1,4 +1,5 @@
 import { Applicant } from '../../models/employee-management/applicant-model.js';
+import { pick } from '../../utils/pick.js';
 
 async function index(req, res) {
   try {
@@ -22,7 +23,8 @@ async function show(req, res) {
 
 async function create(req, res) {
   try {
-    const applicant = new Applicant(req.body);
+    // Public form: only applicant-supplied fields, never status/_id set by HR.
+    const applicant = new Applicant(pick(req.body, ['name', 'nic', 'email', 'file']));
     await applicant.save();
     res.json(applicant);
   } catch (error) {
@@ -33,7 +35,8 @@ async function create(req, res) {
 async function update(req, res) {
   try {
 
-    const applicant = await Applicant.findByIdAndUpdate(req.params.id);
+    const applicant = await Applicant.findById(req.params.id);
+    if (!applicant) return res.status(404).json({ error: 'Applicant not found' });
 
     Object.assign(applicant, req.body);
     await applicant.save();
