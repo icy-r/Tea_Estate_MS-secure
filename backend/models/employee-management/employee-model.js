@@ -91,6 +91,13 @@ const employeeSchema = new Schema({
     select: false,
   },
 
+  // Google account subject ("sub" claim), linked on the first Google sign-in so a
+  // different Google account using the same email later is rejected.
+  googleSub: {
+    type: String,
+    required: false,
+  },
+
   ot:{
     type: Number,
     required: false,
