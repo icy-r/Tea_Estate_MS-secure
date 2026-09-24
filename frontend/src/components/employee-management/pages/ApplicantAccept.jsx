@@ -2,9 +2,9 @@
 import React, { useRef } from "react";
 
 const ApplicantAccept = () => {
-  // service_epnyrmu
-  // template_5terzkg
-  // VcIPCgm20crdairl7
+  // <EMAILJS_SERVICE_ID>
+  // <EMAILJS_TEMPLATE_ID>
+  // <EMAILJS_PUBLIC_KEY>
 
   const form = useRef();
 
@@ -12,8 +12,8 @@ const ApplicantAccept = () => {
     e.preventDefault();
 
     // emailjs
-    //   .sendForm("service_epnyrmu", "template_5terzkg", form.current, {
-    //     publicKey: "VcIPCgm20crdairl7",
+    //   .sendForm("<EMAILJS_SERVICE_ID>", "<EMAILJS_TEMPLATE_ID>", form.current, {
+    //     publicKey: "<EMAILJS_PUBLIC_KEY>",
     //   })
     //   .then(
     //     () => {
