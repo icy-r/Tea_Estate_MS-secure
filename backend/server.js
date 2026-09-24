@@ -38,7 +38,6 @@ import { router as driverRouter } from './routes/transport-management/driver-rou
 // user-management
 import { router as profilesRouter } from "./routes/user-management/profiles-route.js";
 import { router as authRouter } from "./routes/authentication/auth-route.js";
-import { router as getEmployeeIdRouter } from "./routes/authentication/get-employee-id-route.js";
 
 // repair-management
 import { router as assetsRouter } from "./routes/repair-management/asset-route.js";
@@ -66,7 +65,6 @@ import { router as ApplicantRoles } from './routes/employee-management/roles-rou
 
 // supply-management
 import { router as notificationsRouter } from "./routes/repair-management/notification-route.js";
-import { router as userLoginRouter } from "./routes/authentication/user-auth-route.js";
 import { router as orderRouter } from "./routes/supply-management/order-route.js";
 import { router as quotationRouter } from "./routes/supply-management/quotation-route.js";
 import { router as callingSupplyRoute } from "./routes/supply-management/calling-supply-route.js";

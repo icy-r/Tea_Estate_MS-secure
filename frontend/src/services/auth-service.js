@@ -72,13 +72,10 @@ async function changePassword(changePasswordFormData) {
   }
 }
 
+// The separate /userLogin backend (second JWT secret, no expiry) was removed;
+// every account now signs in through the single employee login.
 async function userLogin(loginFormData) {
-  try {
-    const res = await axios.post(`${BASE_URL}/userLogin`, loginFormData);
-    return res.data;
-  } catch (err) {
-    throw new Error(err);
-  }
+  return login(loginFormData);
 }
 
 export { signup, getUser, logout, login, changePassword, userLogin };
