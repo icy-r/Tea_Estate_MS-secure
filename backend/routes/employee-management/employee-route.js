@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as EmployeeController  from "../../controllers/employee-management/employee-controller.js";
-import {checkAuth, decodeUserFromToken} from "../../middleware/auth-mid.js";
+import {checkAuth, decodeUserFromToken, requireRole, MANAGERS} from "../../middleware/auth-mid.js";
 
 
 
@@ -10,24 +10,25 @@ const router = Router();
 
 
 /*---------- Protected Routes ----------*/
-router.use(decodeUserFromToken)
+router.use(decodeUserFromToken, checkAuth)
 // index for getting all machines defined in EmployeeController
-router.get("/", EmployeeController.index);
+// Staff records (salary, NIC, address) are visible to managers and supervisors only
+router.get("/", requireRole(...MANAGERS, "Supervisor"), EmployeeController.index);
 
 // show for getting a single machine defined in EmployeeController
 router.get("/:id", EmployeeController.show);
 
 // create for creating a new machine defined in EmployeeController
-router.post("/", EmployeeController.create);
+router.post("/", requireRole("Employee Manager"), EmployeeController.create);
 
 // update for updating a machine defined in EmployeeController
 router.put("/:id", EmployeeController.update);
 
 // destroy for deleting a machine defined in EmployeeController
-router.delete("/:id", EmployeeController.destroy);
+router.delete("/:id", requireRole("Employee Manager"), EmployeeController.destroy);
 
 // harvest
-router.post("/update-ot", checkAuth, EmployeeController.updateOT);
+router.post("/update-ot", requireRole("Employee Manager", "Field Manager"), EmployeeController.updateOT);
 
 
 export { router };
