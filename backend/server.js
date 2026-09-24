@@ -4,7 +4,6 @@ import "./config/env.js";
 import express from "express";
 import logger from "morgan";
 import cors from "cors";
-import formData from "express-form-data";
 import nodemailer from "nodemailer";
 
 // connect to MongoDB with mongoose
@@ -84,7 +83,6 @@ const app = express();
 app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
-app.use(formData.parse());
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
