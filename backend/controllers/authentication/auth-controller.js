@@ -42,7 +42,7 @@ async function login(req, res) {
       return res.status(400).json({ err: 'Invalid credentials format' })
     }
 
-    const user = await Employee.findOne({ email });
+    const user = await Employee.findOne({ email }).select('+password');
     if (!user) throw new Error("Employee not found");
 
     const isMatch = await user.comparePassword(password);
@@ -57,7 +57,7 @@ async function login(req, res) {
 
 async function changePassword(req, res) {
   try {
-    const user = await Employee.findById(req.user._id)
+    const user = await Employee.findById(req.user._id).select('+password')
     if (!user) throw new Error('Employee not found')
 
     const isMatch = user.comparePassword(req.body.password)
@@ -86,8 +86,19 @@ function handleAuthError(err, res) {
   }
 }
 
+// Only non-sensitive identity claims go into the token. A JWT is signed, not
+// encrypted: anyone holding it can base64-decode the payload, so the password
+// hash, salary, address etc. must never be included.
 function createJWT(user) {
-  return jwt.sign({ user }, process.env.SECRET, { expiresIn: '24h' })
+  const claims = {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    designation: user.designation,
+    department: user.department,
+  }
+  return jwt.sign({ user: claims }, process.env.SECRET, { expiresIn: '8h' })
 }
 
 export { signup, login, changePassword }
