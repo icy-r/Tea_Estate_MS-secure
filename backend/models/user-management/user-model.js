@@ -1,5 +1,5 @@
 import mongoose from 'mongoose' // Importing the mongoose library for MongoDB integration
-import bcrypt from 'bcrypt' // Importing the bcrypt library for password hashing
+import bcrypt from "bcryptjs" // Importing the bcrypt library for password hashing
 
 const saltRounds = 6 // Setting the number of salt rounds for password hashing
 const Schema = mongoose.Schema // Creating a shorthand reference to the mongoose Schema class

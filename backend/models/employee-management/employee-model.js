@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 const Schema = mongoose.Schema;
 // bcrypt work factor: 12 (~250 ms per hash) makes offline cracking far slower than 6.
 const saltRounds = 12;

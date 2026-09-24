@@ -5,7 +5,6 @@ import axios from "../../../services/axios.js";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import StatusCard from "./StatusCard.jsx";
-import { set } from "mongoose";
 
 const StatusMain = (supplierid) => {
     const [orderDetails, setOrderDetails] = useState(null);
