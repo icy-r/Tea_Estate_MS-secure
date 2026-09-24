@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as tokenService from "../../services/auth-token.js";
 
@@ -8,8 +8,13 @@ import * as tokenService from "../../services/auth-token.js";
 // which browsers never send to a server.
 const GoogleCallback = ({ handleAuthEvt }) => {
   const navigate = useNavigate();
+  // React StrictMode runs effects twice in development; the first run already
+  // consumed and cleared the fragment, so the second must not treat it as missing.
+  const handled = useRef(false);
 
   useEffect(() => {
+    if (handled.current) return;
+    handled.current = true;
     const token = new URLSearchParams(window.location.hash.slice(1)).get("token");
     // Remove the token from the address bar and browser history straight away.
     window.history.replaceState(null, "", window.location.pathname);

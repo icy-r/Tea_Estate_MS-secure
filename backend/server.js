@@ -88,6 +88,9 @@ app.use(helmet());
 // (previously cors() allowed every origin: Access-Control-Allow-Origin: *).
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(",");
 app.use(cors({ origin: allowedOrigins, credentials: true }));
+// Log paths without query strings: OAuth callbacks carry the authorization code
+// and state in the query, which must not end up in log files.
+logger.token("url", (req) => req.originalUrl.split("?")[0]);
 app.use(logger("dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(safeErrors);
