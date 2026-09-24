@@ -4,6 +4,7 @@ import "./config/env.js";
 import express from "express";
 import logger from "morgan";
 import cors from "cors";
+import helmet from "helmet";
 import formData from "express-form-data";
 import nodemailer from "nodemailer";
 
@@ -81,7 +82,14 @@ const app = express();
 
 
 // basic middleware
-app.use(cors());
+// Security headers (nosniff, frame-ancestors, HSTS, referrer policy, ...) and no
+// X-Powered-By banner advertising the framework.
+app.disable("x-powered-by");
+app.use(helmet());
+// Only the configured frontend origin may call the API from a browser
+// (previously cors() allowed every origin: Access-Control-Allow-Origin: *).
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(",");
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(formData.parse());
