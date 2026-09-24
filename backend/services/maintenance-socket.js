@@ -3,7 +3,8 @@ import { Server } from "socket.io";
 function setupMaintenanceSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      // Same origin allow-list as the REST API instead of "*".
+      origin: (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(","),
       methods: ["GET", "POST"],
     },
   });
