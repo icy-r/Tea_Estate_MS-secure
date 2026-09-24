@@ -60,10 +60,17 @@ async function changePassword(req, res) {
     const user = await Employee.findById(req.user._id).select('+password')
     if (!user) throw new Error('Employee not found')
 
-    const isMatch = user.comparePassword(req.body.password)
+    // comparePassword is async: without await it returns a Promise, which is
+    // always truthy, so the current-password check could never fail.
+    const isMatch = await user.comparePassword(String(req.body.password))
     if (!isMatch) throw new Error('Incorrect password')
 
-    user.password = req.body.newPassword
+    const newPassword = req.body.newPassword
+    if (typeof newPassword !== 'string' || newPassword.length < 10) {
+      return res.status(400).json({ err: 'New password must be at least 10 characters' })
+    }
+
+    user.password = newPassword
     await user.save()
 
     const token = createJWT(user)
