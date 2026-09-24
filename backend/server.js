@@ -74,6 +74,7 @@ import { router as supplierManagerRouter } from "./routes/supply-management/supp
 import { router as supplyRouter } from "./routes/supply-management/supply-route.js";
 
 import { log } from "console";
+import { decodeUserFromToken, checkAuth } from "./middleware/auth-mid.js";
 
 // create the express app
 const app = express();
@@ -94,8 +95,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Email sending route
-app.post("/send-email", (req, res) => {
+// Email sending route. It sends from the estate's Gmail account, so it must
+// not be callable by anonymous users (it was an open relay for spam/phishing).
+app.post("/send-email", decodeUserFromToken, checkAuth, (req, res) => {
   const { to, subject, text } = req.body;
 
   const mailOptions = {
@@ -105,9 +107,14 @@ app.post("/send-email", (req, res) => {
     text,
   };
 
+  if (typeof to !== "string" || !/^[^@\s]+@[^@\s]+$/.test(to)) {
+    return res.status(400).json({ err: "Invalid recipient" });
+  }
+
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return res.status(500).send(error.toString());
+      console.error("send-email failed:", error);
+      return res.status(500).json({ err: "Email could not be sent" });
     }
     res.status(200).send("Email sent: " + info.response);
   });
