@@ -74,6 +74,7 @@ import { router as supplierManagerRouter } from "./routes/supply-management/supp
 import { router as supplyRouter } from "./routes/supply-management/supply-route.js";
 
 import { log } from "console";
+import { decodeUserFromToken, requireAuth } from "./middleware/auth-mid.js";
 
 // create the express app
 const app = express();
@@ -113,6 +114,10 @@ app.post("/send-email", (req, res) => {
   });
 });
 
+
+// Every /api request is authenticated unless the route is on the public list
+// in middleware/auth-mid.js (default-deny instead of per-router opt-in).
+app.use("/api", decodeUserFromToken, requireAuth);
 
 // mount routes
 app.use("/api/notifications", notificationsRouter);

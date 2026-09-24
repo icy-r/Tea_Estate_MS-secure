@@ -23,7 +23,9 @@ const LeaveTable = () => {
     // Fetch leave data from the API
     const fetchLeaves = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/employeeProfile"); // Adjust the API endpoint
+        const response = await fetch("http://localhost:3001/api/employeeProfile", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch data from server");
         }
