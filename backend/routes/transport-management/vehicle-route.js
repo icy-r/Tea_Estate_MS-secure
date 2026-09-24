@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { textOnlyForm } from "../../middleware/upload.js";
 import * as vehicleController from "../../controllers/transport-management/vehicle-controller.js";
 import { checkAuth, decodeUserFromToken } from "../../middleware/auth-mid.js";
 
@@ -12,7 +13,7 @@ router.get("/", checkAuth, vehicleController.index);
 router.get("/:id", checkAuth, vehicleController.show);
 
 // Adjusted the post route to handle multiple files
-router.post("/", checkAuth,vehicleController.create);
+router.post("/", checkAuth, textOnlyForm, vehicleController.create);
 
 router.put("/:id", checkAuth, vehicleController.update);
 router.delete("/:id", checkAuth, vehicleController.destroy);

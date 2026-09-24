@@ -141,3 +141,6 @@ dist
 
 # keep the templates
 !.env.example
+
+# user uploads (runtime data)
+backend/uploads/

@@ -5,7 +5,6 @@ import express from "express";
 import logger from "morgan";
 import cors from "cors";
 import helmet from "helmet";
-import formData from "express-form-data";
 import nodemailer from "nodemailer";
 
 // connect to MongoDB with mongoose
@@ -92,7 +91,6 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(logger("dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(safeErrors);
-app.use(formData.parse());
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({

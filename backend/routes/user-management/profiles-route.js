@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { imageUpload } from '../../middleware/upload.js'
 import { decodeUserFromToken, checkAuth } from '../../middleware/auth-mid.js'
 import * as profilesCtrl from '../../controllers/user-management/profiles-controller.js'
 
@@ -10,6 +11,6 @@ const router = Router()
 /*---------- Protected Routes ----------*/
 router.use(decodeUserFromToken)
 router.get('/', checkAuth, profilesCtrl.index)
-router.put('/:id/add-photo', checkAuth, profilesCtrl.addPhoto)
+router.put('/:id/add-photo', checkAuth, imageUpload.single('photo'), profilesCtrl.addPhoto)
 
 export { router }
