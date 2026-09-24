@@ -79,6 +79,9 @@ const app = express();
 
 // basic middleware
 app.use(cors());
+// Log paths without query strings: OAuth callbacks carry the authorization code
+// and state in the query, which must not end up in log files.
+logger.token("url", (req) => req.originalUrl.split("?")[0]);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(formData.parse());
