@@ -113,4 +113,4 @@ function createJWT(user) {
   return jwt.sign({ user: claims }, process.env.SECRET, { expiresIn: '8h' })
 }
 
-export { signup, login, changePassword }
+export { signup, login, changePassword, createJWT }

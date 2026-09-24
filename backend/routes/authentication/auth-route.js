@@ -2,6 +2,7 @@ import { Router } from 'express'
 import rateLimit from 'express-rate-limit'
 import { decodeUserFromToken, checkAuth, requireRole } from '../../middleware/auth-mid.js'
 import * as authCtrl from '../../controllers/authentication/auth-controller.js'
+import * as googleCtrl from '../../controllers/authentication/google-oidc-controller.js'
 
 const router = Router()
 
@@ -18,6 +19,9 @@ const loginLimiter = rateLimit({
 
 /*---------- Public Routes ----------*/
 router.post('/login', loginLimiter, authCtrl.login)
+// Sign in with Google (OpenID Connect authorization code flow + PKCE)
+router.get('/google', googleCtrl.start)
+router.get('/google/callback', loginLimiter, googleCtrl.callback)
 
 /*---------- Protected Routes ----------*/
 router.use(decodeUserFromToken)

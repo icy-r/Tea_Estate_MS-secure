@@ -6,13 +6,25 @@ import logo from "@assets/logo.png";
 import * as authService from "../../services/auth-service.js";
 import { Link } from "@mui/joy";
 
+const API_ORIGIN = import.meta.env.HOSTED_URL || "http://localhost:3001";
+const SSO_ERRORS = {
+  no_account: "This Google account's email is not registered as an employee.",
+  account_mismatch: "This email is already linked to a different Google account.",
+  denied: "Google sign-in was cancelled.",
+  unverified_email: "Your Google email address is not verified.",
+  not_configured: "Google sign-in is not configured on the server.",
+};
+
 const Login = ({ handleAuthEvt }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const ssoError = new URLSearchParams(window.location.search).get("sso_error");
+  const [error, setError] = useState(
+    ssoError ? SSO_ERRORS[ssoError] || "Google sign-in failed, please try again." : ""
+  );
 
   const navigate = useNavigate();
 
@@ -100,6 +112,19 @@ const Login = ({ handleAuthEvt }) => {
                 Login
               </button>
             </div>
+            <div className="flex items-center my-4 text-xs text-gray-400">
+              <div className="flex-grow border-t" />
+              <span className="mx-2">or</span>
+              <div className="flex-grow border-t" />
+            </div>
+            {/* Full-page redirect: the backend starts the OpenID Connect flow */}
+            <a
+              href={`${API_ORIGIN}/api/auth/google`}
+              className="flex items-center justify-center gap-2 w-full border border-gray-300 rounded py-2 text-gray-700 hover:bg-gray-50"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
+              Sign in with Google
+            </a>
             <div className="mt-6 text-center text-sm text-color_focus">
               Don&apos;t have an account?{" "}
               <a href="#" className="text-color_button underline">
