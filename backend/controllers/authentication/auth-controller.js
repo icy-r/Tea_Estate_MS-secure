@@ -35,12 +35,17 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    if (!process.env.SECRET) throw new Error("no SECRET in back-end .env");
+    const { email, password } = req.body
+    // Reject non-string credentials outright (defence in depth on top of
+    // mongoose sanitizeFilter): an object here is an injection attempt.
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ err: 'Invalid credentials format' })
+    }
 
-    const user = await Employee.findOne({ email: req.body.email });
+    const user = await Employee.findOne({ email });
     if (!user) throw new Error("Employee not found");
 
-    const isMatch = await user.comparePassword(req.body.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) throw new Error("Incorrect password");
 
     const token = createJWT(user);
