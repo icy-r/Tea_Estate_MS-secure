@@ -76,6 +76,7 @@ import { router as supplyRouter } from "./routes/supply-management/supply-route.
 
 import { log } from "console";
 import { decodeUserFromToken, requireAuth } from "./middleware/auth-mid.js";
+import { safeErrors } from "./middleware/safe-errors.js";
 
 // create the express app
 const app = express();
@@ -91,7 +92,8 @@ app.use(helmet());
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(",");
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(logger("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
+app.use(safeErrors);
 app.use(formData.parse());
 
 // Configure Nodemailer transporter
@@ -187,17 +189,17 @@ app.use('/api/harvests', harvestRouter)
 app.use('/api/labours', labourRouter)
 
 
-// handle 404 errors
+// handle 404 errors (the old handler logged the whole req object, including
+// the Authorization header, on every miss)
 app.use((req, res) => {
-  console.log(req);
   res.status(404).json({ err: "Not found" });
 });
 
-// handle all other errors
+// handle all other errors: full detail in the server log, generic text to the client
 app.use(function (err, req, res, next) {
-  console.log(req);
-  console.log(err);
-  res.status(err.status || 500).json({ err: err.message });
+  console.error(`[${req.method} ${req.originalUrl}]`, err);
+  const status = err.status || 500;
+  res.status(status).json({ err: status < 500 ? err.message : "Internal server error" });
 });
 
 export { app };
