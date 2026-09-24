@@ -199,7 +199,7 @@ app.use((req, res) => {
 
 // handle all other errors: full detail in the server log, generic text to the client
 app.use(function (err, req, res, next) {
-  console.error(`[${req.method} ${req.originalUrl}]`, err);
+  console.error("[%s %s]", req.method, req.originalUrl, err);
   const status = err.status || 500;
   res.status(status).json({ err: status < 500 ? err.message : "Internal server error" });
 });

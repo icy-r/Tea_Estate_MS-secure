@@ -22,7 +22,7 @@ export function safeErrors(req, res, next) {
     if (body && typeof body === 'object' && !Array.isArray(body)) {
       for (const key of ['error', 'err']) {
         if (key in body && typeof body[key] === 'object' && body[key] !== null) {
-          console.error(`[${req.method} ${req.originalUrl}]`, body[key])
+          console.error("[%s %s]", req.method, req.originalUrl, body[key])
           body = { ...body, [key]: sanitize(body[key]) }
           if (body[key] === GENERIC.CastError && res.statusCode >= 500) res.status(400)
         }
