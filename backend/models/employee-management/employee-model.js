@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 const Schema = mongoose.Schema;
-const saltRounds = 6;
+// bcrypt work factor: 12 (~250 ms per hash) makes offline cracking far slower than 6.
+const saltRounds = 12;
 
 const employeeSchema = new Schema({
   firstName: {
@@ -85,6 +86,9 @@ const employeeSchema = new Schema({
   password: {
     type: String,
     required: true,
+    // Never returned by queries unless explicitly requested with .select('+password'),
+    // so list/detail endpoints cannot leak bcrypt hashes.
+    select: false,
   },
 
   ot:{
