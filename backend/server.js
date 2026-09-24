@@ -1,5 +1,6 @@
 // npm packages
 import "dotenv/config.js";
+import "./config/env.js";
 import express from "express";
 import logger from "morgan";
 import cors from "cors";
