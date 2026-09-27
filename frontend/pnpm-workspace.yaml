@@ -1,0 +1,10 @@
+packages:
+  - "."
+
+# pnpm 11 refuses install until every dependency build is approved or denied.
+# These four are the frontend packages that ship an install script.
+allowBuilds:
+  "@firebase/util": true
+  core-js: true
+  esbuild: true
+  protobufjs: true
