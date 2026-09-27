@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Notification } from "../../models/repair-management/notification-model.js";
 import { setInterval } from "timers";
 
@@ -59,7 +60,7 @@ const deleteOldNotifications = async () => {
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
     const result = await Notification.deleteMany({
-      createdAt: { $lte: oneDayAgo },
+      createdAt: mongoose.trusted({ $lte: oneDayAgo }),
     });
 
     console.log(

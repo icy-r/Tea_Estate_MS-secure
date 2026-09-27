@@ -14,7 +14,7 @@ cron.schedule('0 0 * * *', async () => {
 
     try {
         // Fetch all transports
-        const transports = await Transport.find({ dailyOccurrence: { $gte: 1 } }); // Change criteria as necessary
+        const transports = await Transport.find({ dailyOccurrence: mongoose.trusted({ $gte: 1 }) }); // Change criteria as necessary
 
         const today = new Date();
         const todayDate = today.toISOString().split('T')[0]; // Get today’s date in YYYY-MM-DD format
