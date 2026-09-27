@@ -2,6 +2,10 @@ import jwt from 'jsonwebtoken'
 
 import { Employee } from '../../models/employee-management/employee-model.js'
 import { Profile } from '../../models/user-management/profile-model.js'
+import { pick } from '../../utils/pick.js'
+
+const SIGNUP_FIELDS = ['firstName', 'lastName', 'Id', 'email', 'age', 'gender', 'dateOfBirth',
+  'contactNumber', 'designation', 'department', 'dateOfJoining', 'salary', 'leavesLeft', 'address', 'password']
 
 async function signup(req, res) {
   try {
@@ -10,12 +14,13 @@ async function signup(req, res) {
       throw new Error('no CLOUDINARY_URL in back-end .env file')
     }
 
-    const user = await Employee.findOne({ email: req.body.email })
+    const data = pick(req.body, SIGNUP_FIELDS)
+    const user = await Employee.findOne({ email: data.email })
     if (user) throw new Error('Account already exists')
 
-    const newProfile = await Profile.create(req.body)
+    const newProfile = await Profile.create({ name: `${data.firstName} ${data.lastName}` })
     req.body.profile = newProfile._id
-    const newEmployee = await Employee.create(req.body)
+    const newEmployee = await Employee.create({ ...data, profile: newProfile._id })
 
     const token = createJWT(newEmployee)
     res.status(200).json({ token })
@@ -35,12 +40,17 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    if (!process.env.SECRET) throw new Error("no SECRET in back-end .env");
+    const { email, password } = req.body
+    // Reject non-string credentials outright (defence in depth on top of
+    // mongoose sanitizeFilter): an object here is an injection attempt.
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ err: 'Invalid credentials format' })
+    }
 
-    const user = await Employee.findOne({ email: req.body.email });
+    const user = await Employee.findOne({ email });
     if (!user) throw new Error("Employee not found");
 
-    const isMatch = await user.comparePassword(req.body.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) throw new Error("Incorrect password");
 
     const token = createJWT(user);
@@ -55,10 +65,17 @@ async function changePassword(req, res) {
     const user = await Employee.findById(req.user._id)
     if (!user) throw new Error('Employee not found')
 
-    const isMatch = user.comparePassword(req.body.password)
+    // comparePassword is async: without await it returns a Promise, which is
+    // always truthy, so the current-password check could never fail.
+    const isMatch = await user.comparePassword(String(req.body.password))
     if (!isMatch) throw new Error('Incorrect password')
 
-    user.password = req.body.newPassword
+    const newPassword = req.body.newPassword
+    if (typeof newPassword !== 'string' || newPassword.length < 10) {
+      return res.status(400).json({ err: 'New password must be at least 10 characters' })
+    }
+
+    user.password = newPassword
     await user.save()
 
     const token = createJWT(user)
