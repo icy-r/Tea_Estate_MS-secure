@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 const Schema = mongoose.Schema;
-const saltRounds = 6;
+// bcrypt work factor: 12 (~250 ms per hash) makes offline cracking far slower than 6.
+const saltRounds = 12;
 
 const employeeSchema = new Schema({
   firstName: {
@@ -85,6 +86,16 @@ const employeeSchema = new Schema({
   password: {
     type: String,
     required: true,
+    // Never returned by queries unless explicitly requested with .select('+password'),
+    // so list/detail endpoints cannot leak bcrypt hashes.
+    select: false,
+  },
+
+  // Google account subject ("sub" claim), linked on the first Google sign-in so a
+  // different Google account using the same email later is rejected.
+  googleSub: {
+    type: String,
+    required: false,
   },
 
   ot:{

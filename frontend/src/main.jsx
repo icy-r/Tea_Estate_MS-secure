@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import Routes from './routes'
 import './index.css'
+import './services/auth-interceptor.js'
 import { jsPDF } from 'jspdf'
 import { applyPlugin } from 'jspdf-autotable'
 

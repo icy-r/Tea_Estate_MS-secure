@@ -37,7 +37,6 @@ import { router as driverRouter } from './routes/transport-management/driver-rou
 // user-management
 import { router as profilesRouter } from "./routes/user-management/profiles-route.js";
 import { router as authRouter } from "./routes/authentication/auth-route.js";
-import { router as getEmployeeIdRouter } from "./routes/authentication/get-employee-id-route.js";
 
 // repair-management
 import { router as assetsRouter } from "./routes/repair-management/asset-route.js";
@@ -65,7 +64,6 @@ import { router as ApplicantRoles } from './routes/employee-management/roles-rou
 
 // supply-management
 import { router as notificationsRouter } from "./routes/repair-management/notification-route.js";
-import { router as userLoginRouter } from "./routes/authentication/user-auth-route.js";
 import { router as orderRouter } from "./routes/supply-management/order-route.js";
 import { router as quotationRouter } from "./routes/supply-management/quotation-route.js";
 import { router as callingSupplyRoute } from "./routes/supply-management/calling-supply-route.js";
@@ -74,8 +72,8 @@ import { router as supplierManagerRouter } from "./routes/supply-management/supp
 import { router as supplyRouter } from "./routes/supply-management/supply-route.js";
 
 import { log } from "console";
+import { decodeUserFromToken, requireAuth, requireRole, MANAGERS } from "./middleware/auth-mid.js";
 import { safeErrors } from "./middleware/safe-errors.js";
-import { decodeUserFromToken, checkAuth } from "./middleware/auth-mid.js";
 
 // create the express app
 const app = express();
@@ -90,6 +88,9 @@ app.use(helmet());
 // (previously cors() allowed every origin: Access-Control-Allow-Origin: *).
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(",");
 app.use(cors({ origin: allowedOrigins, credentials: true }));
+// Log paths without query strings: OAuth callbacks carry the authorization code
+// and state in the query, which must not end up in log files.
+logger.token("url", (req) => req.originalUrl.split("?")[0]);
 app.use(logger("dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(safeErrors);
@@ -105,7 +106,7 @@ const transporter = nodemailer.createTransport({
 
 // Email sending route. It sends from the estate's Gmail account, so it must
 // not be callable by anonymous users (it was an open relay for spam/phishing).
-app.post("/send-email", decodeUserFromToken, checkAuth, (req, res) => {
+app.post("/send-email", decodeUserFromToken, requireRole(...MANAGERS), (req, res) => {
   const { to, subject, text } = req.body;
 
   const mailOptions = {
@@ -128,6 +129,10 @@ app.post("/send-email", decodeUserFromToken, checkAuth, (req, res) => {
   });
 });
 
+
+// Every /api request is authenticated unless the route is on the public list
+// in middleware/auth-mid.js (default-deny instead of per-router opt-in).
+app.use("/api", decodeUserFromToken, requireAuth);
 
 // mount routes
 app.use("/api/notifications", notificationsRouter);

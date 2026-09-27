@@ -14,6 +14,7 @@ import ProtectedRoutes from "../Routes/ProtectedRoutes.jsx";
 import InventoryDashboard from "../components/inventory-management/pages/InventoryDashboard.jsx";
 import BuyerRoutes from "../components/product-management/BuyerRoutes.jsx";
 import AdminLogin from "./login/AdminLogin.jsx";
+import GoogleCallback from "./login/GoogleCallback.jsx";
 import LandingPage from "./landingPage/LandingPage.jsx";
 import CreateInventory from '../components/inventory-management/components/CreateInventory.jsx';
 
@@ -47,6 +48,10 @@ function App() {
           <Route
             path="auth/login"
             element={<AdminLogin handleAuthEvt={handleAuthEvt} />}
+          />
+          <Route
+            path="auth/google-callback"
+            element={<GoogleCallback handleAuthEvt={handleAuthEvt} />}
           />
           <Route path="/about" element={<div>About</div>} />
           {/* Protected Routes */}
