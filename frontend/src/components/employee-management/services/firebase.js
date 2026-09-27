@@ -2,15 +2,15 @@ import { initializeApp } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
 
 
-// Your Firebase configuration (get this from Firebase console)
+// Firebase web config is read from Vite env vars (see frontend/.env.example) so no
+// project keys are committed to source control.
 const firebaseConfig = {
-    apiKey: "AIzaSyCwPD2O7rS3ImEaCa_Mw73xUgD5Rf_umTc",
-    authDomain: "tea-estate-ms.firebaseapp.com",
-    projectId: "tea-estate-ms",
-    storageBucket: "tea-estate-ms.appspot.com",
-    messagingSenderId: "729576568007",
-    appId: "1:729576568007:web:be0b17704a4be8a8f0fae2",
-    measurementId: "G-0TZQVCQ4JF"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase

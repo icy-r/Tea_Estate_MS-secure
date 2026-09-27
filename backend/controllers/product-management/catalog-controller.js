@@ -11,8 +11,10 @@ async function index(req, res) {
 
 async function addPhoto(req, res) {
     try {
-        const imageFile = req.files.productImage.path;
+        if (!req.file) return res.status(400).json({ error: 'An image file is required' });
         const catalog = await Catalog.findById(req.params.id);
+        if (!catalog) return res.status(404).json({ error: 'Catalog item not found' });
+        const imageFile = req.file.filename;
         catalog.productImage = imageFile;
         await catalog.save();
         res.status(201).json(catalog.productImage);

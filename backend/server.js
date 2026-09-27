@@ -1,10 +1,10 @@
 // npm packages
 import "dotenv/config.js";
+import "./config/env.js";
 import express from "express";
 import logger from "morgan";
 import cors from "cors";
 import helmet from "helmet";
-import formData from "express-form-data";
 import nodemailer from "nodemailer";
 
 // connect to MongoDB with mongoose
@@ -75,6 +75,7 @@ import { router as supplyRouter } from "./routes/supply-management/supply-route.
 
 import { log } from "console";
 import { safeErrors } from "./middleware/safe-errors.js";
+import { decodeUserFromToken, checkAuth } from "./middleware/auth-mid.js";
 
 // create the express app
 const app = express();
@@ -92,7 +93,6 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(logger("dev"));
 app.use(express.json({ limit: "1mb" }));
 app.use(safeErrors);
-app.use(formData.parse());
 
 // Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -103,8 +103,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Email sending route
-app.post("/send-email", (req, res) => {
+// Email sending route. It sends from the estate's Gmail account, so it must
+// not be callable by anonymous users (it was an open relay for spam/phishing).
+app.post("/send-email", decodeUserFromToken, checkAuth, (req, res) => {
   const { to, subject, text } = req.body;
 
   const mailOptions = {
@@ -114,9 +115,14 @@ app.post("/send-email", (req, res) => {
     text,
   };
 
+  if (typeof to !== "string" || !/^[^@\s]+@[^@\s]+$/.test(to)) {
+    return res.status(400).json({ err: "Invalid recipient" });
+  }
+
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return res.status(500).send(error.toString());
+      console.error("send-email failed:", error);
+      return res.status(500).json({ err: "Email could not be sent" });
     }
     res.status(200).send("Email sent: " + info.response);
   });
