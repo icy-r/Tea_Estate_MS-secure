@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Auction } from '../../models/sales-management/auction-model.js';
 import { Buyer } from '../../models/product-management/buyer-model.js';  // Import Buyer model
 import { Catalog } from '../../models/product-management/catalog-model.js';  // Import Catalog model
@@ -49,7 +50,7 @@ async function create(req, res) {
     const { buyer_id, productID } = req.body;
 
     // Validate if the buyer IDs exist in the Buyer model
-    const buyers = await Buyer.find({ _id: { $in: buyer_id } });
+    const buyers = await Buyer.find({ _id: mongoose.trusted({ $in: buyer_id }) });
     if (buyers.length !== buyer_id.length) {
       return res.status(400).json({ error: "Some buyers not found" });
     }
@@ -87,7 +88,7 @@ async function update(req, res) {
     const { buyer_id, productID } = req.body;
 
     // Validate if the buyer IDs exist in the Buyer model
-    const buyers = await Buyer.find({ _id: { $in: buyer_id } });
+    const buyers = await Buyer.find({ _id: mongoose.trusted({ $in: buyer_id }) });
     if (buyers.length !== buyer_id.length) {
       return res.status(400).json({ error: "Some buyers not found" });
     }

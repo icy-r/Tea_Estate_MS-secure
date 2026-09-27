@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Asset } from "../../models/repair-management/asset-model.js";
 
 // index for getting all assets
@@ -69,8 +70,9 @@ export const destroy = async (req, res) => {
 export const search = async (req, res) => {
   try {
     //search for asset by assetNumber matching the search field
+    const escaped = String(req.params.id).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const assets = await Asset.find({
-      assetNumber: { $regex: req.params.id, $options: "i" },
+      assetNumber: mongoose.trusted({ $regex: escaped, $options: "i" }),
     });
     console.log(assets);
     res.status(200).json(assets);
