@@ -10,7 +10,9 @@ const router = Router();
 
 
 /*---------- Protected Routes ----------*/
-router.use(decodeUserFromToken)
+// Every leave endpoint needs a login; who may see or change which request
+// (owner vs Employee Manager) is checked in the controller.
+router.use(decodeUserFromToken, checkAuth)
 // index for getting all machines defined in RecruitmentController
 router.get("/", RecruitmentController.index);
 
@@ -18,7 +20,7 @@ router.get("/", RecruitmentController.index);
 router.get("/:id", RecruitmentController.show);
 
 // create for creating a new machine defined in RecruitmentController
-router.post("/", checkAuth, RecruitmentController.create);
+router.post("/", RecruitmentController.create);
 
 // update for updating a machine defined in RecruitmentController
 router.put("/:id",  RecruitmentController.update);
